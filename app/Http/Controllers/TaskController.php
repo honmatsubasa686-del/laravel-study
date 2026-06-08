@@ -13,7 +13,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = auth()->user()->tasks()->with('category')
+        $tasks = auth()->user()->tasks()
+            ->with('category')
             ->orderBy('priority', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -52,9 +53,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        if ($task->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorize('view', $task);
 
         $task->load('category');
 
@@ -66,9 +65,7 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        if ($task->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorize('update', $task);
 
         $categories = Category::orderBy('name')->get();
 
@@ -80,9 +77,7 @@ class TaskController extends Controller
      */
     public function update(TaskRequest $request, Task $task)
     {
-        if ($task->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorize('update', $task);
 
         $task->update($request->validated());
 
@@ -95,9 +90,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        if ($task->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorize('delete', $task);
 
         $task->delete();
 
